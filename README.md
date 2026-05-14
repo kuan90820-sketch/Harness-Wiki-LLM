@@ -1,12 +1,13 @@
 ![License: MIT](https://img.shields.io/badge/license-MIT-blue)
 ![Template](https://img.shields.io/badge/template-LLM%20Wiki-purple)
 ![Pattern](https://img.shields.io/badge/pattern-Harness%20%2B%20Wiki-orange)
+![Agent](https://img.shields.io/badge/agent-Claude%20%7C%20Codex%20%7C%20Antigravity-green)
 
 # Harness Wiki LLM 模板
 
-> 一個 **LLM 維護的個人知識庫模板**，混合兩個架構：
+> 一個 **LLM 維護的個人知識庫模板**，融合兩套設計哲學：
 >
-> - **LLM Wiki**（[架構.md](架構.md)）— 三層結構（raw / wiki / schema）+ Ingest / Query / Lint 三大操作。
+> - **LLM Wiki**（[架構.md](架構.md)）— 三層結構（raw / wiki / prompts）+ Ingest / Query / Lint 三大操作，靈感來自 [Andrej Karpathy LLM Wiki 架構](Andrej%20Karpathy%20LLM%20Wiki%20架構.md)。
 > - **Harness Engineering**（[deusyu/harness-engineering](https://github.com/deusyu/harness-engineering)）— Repo 即真實來源、地圖而非手冊、機械化檢查、漸進式披露。
 >
 > **人類掌舵（選 source、提問題、定方向），LLM 執行（讀、整理、跨引、維護）。**
@@ -28,36 +29,45 @@ Harness Wiki：文件丟進去 → LLM 寫進 wiki → wiki 累積 → 提問從
 
 ```
 Harness-Wiki-LLM/
-├── README.md              ← 你在這裡（給人看）
-├── CLAUDE.md              ← 給 LLM 的根入口（≤100 行的「地圖」）
-├── AGENTS.md              ← 同上，給 Codex / 其他 agent
-├── 架構.md                ← LLM Wiki 原始理念（保留作哲學參考）
+├── README.md                        ← 你在這裡（給人看）
+├── CLAUDE.md                        ← 給 Claude Code 的根入口（≤100 行的「地圖」）
+├── AGENTS.md                        ← 同上，給 Codex / 其他 agent
+├── 架構.md                          ← 本模板設計理念（為什麼長這樣）
+├── Andrej Karpathy LLM Wiki 架構.md ← 思想源頭（哲學參考）
 │
-├── raw/                   # Layer 1 — 不可變原始 source（人類擁有）
-│   └── AGENTS.md          #   如何放原料進來
+├── raw/                        # Layer 1 — 不可變原始 source（人類擁有，LLM 唯讀）
+│   └── AGENTS.md               #   如何放原料進來、命名規則
 │
-├── wiki/                  # Layer 2 — LLM 維護的知識庫（LLM 擁有）
-│   ├── AGENTS.md          #   wiki 寫作公約
-│   ├── index.md           #   內容目錄（每次 ingest 更新）
-│   ├── log.md             #   時序 append-only 紀錄
-│   ├── entities/          #   實體頁（人/組織/物件/地方）
-│   ├── concepts/          #   概念頁
-│   ├── summaries/         #   單篇 source 摘要
-│   └── syntheses/         #   跨 source 綜合（比較表、論點、發現）
+├── wiki/                       # Layer 2 — LLM 維護的知識庫（LLM 擁有）
+│   ├── AGENTS.md               #   wiki 寫作公約（frontmatter、連結規範）
+│   ├── index.md                #   內容目錄（每次 ingest 更新）
+│   ├── log.md                  #   時序 append-only 紀錄
+│   ├── entities/               #   實體頁（人 / 組織 / 產品 / 地方）
+│   ├── concepts/               #   概念頁（方法論、原則、術語）
+│   ├── summaries/              #   單篇 source 摘要（與 raw/ 一一對應）
+│   └── syntheses/              #   跨 source 綜合（比較表、論點、open-questions）
 │
-├── prompts/               # Layer 3 助攻 — 經過驗證的工作流提示詞
-│   ├── ingest.md          #   把新 source 整合進 wiki
-│   ├── query.md           #   針對 wiki 提問並回填新頁
-│   └── lint.md            #   wiki 健康檢查
+├── prompts/                    # Layer 3 助攻 — 經過驗證的工作流 SOP
+│   ├── ingest.md               #   7 步驟：把新 source 整合進 wiki
+│   ├── query.md                #   5 步驟：針對 wiki 提問並回填 syntheses
+│   └── lint.md                 #   兩階段：W1–W5 機械化 + B1–B6 語意健康檢查
 │
 ├── scripts/
-│   └── check-consistency.sh   # 機械化守門：孤兒頁、缺索引、log 格式
+│   └── check-consistency.sh   # 機械化守門（W1–W5）：孤兒頁、缺索引、斷連結、缺 summary
 │
-├── .githooks/pre-commit       # 本地反饋：commit 前跑檢查
-└── .github/workflows/consistency.yml  # CI 兜底：合併前再跑一次
+├── .claude/                    # Claude Code 整合
+│   ├── settings.json           #   權限白名單
+│   ├── commands/               #   /ingest、/query、/lint slash command
+│   └── skills/karpathy-guidelines/  # 自動載入的精簡編碼守則
+│
+├── .agent/                     # 其他 agent 框架相容層（Antigravity 等）
+│   └── workflows/              #   ingest / query / lint 工作流殼層
+│
+├── .githooks/pre-commit        # 本地反饋：commit 前跑 W1–W5
+└── .github/workflows/consistency.yml  # CI 兜底：push / PR 觸發同一腳本
 ```
 
-每個子目錄都有自己的 `AGENTS.md`，告訴智能體「這裡放什麼、要遵守什麼規則」。這正是 Harness Engineering 的「地圖而非手冊」+「漸進式披露」。
+每個子目錄都有自己的 `AGENTS.md`（全 repo 共 8 份），告訴智能體「這裡放什麼、要遵守什麼規則」——這正是 Harness Engineering「地圖而非手冊」+「漸進式披露」的體現。
 
 ---
 
