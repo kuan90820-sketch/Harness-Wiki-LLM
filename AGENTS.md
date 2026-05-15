@@ -8,12 +8,12 @@
 
 ## Slash commands（Antigravity 專用）
 
-Antigravity 的 slash command 會找 `.agent/workflows/<name>.md`，不會找 `prompts/`。為此 repo 提供三個薄殼，對應 `prompts/` 三份 SOP：
+Antigravity 的 slash command 會找 `.agent/workflows/<name>.md`，不會找 `prompts/` 或 `.claude/skills/`。為此 repo 提供三層轉介：
 
-| Slash | 薄殼 | 真正邏輯 |
-|-------|------|---------|
-| `/ingest` | [`.agent/workflows/ingest.md`](.agent/workflows/ingest.md) | [`prompts/ingest.md`](prompts/ingest.md) |
-| `/query` | [`.agent/workflows/query.md`](.agent/workflows/query.md) | [`prompts/query.md`](prompts/query.md) |
-| `/lint` | [`.agent/workflows/lint.md`](.agent/workflows/lint.md) | [`prompts/lint.md`](prompts/lint.md) |
+| Slash | 入口薄殼 | 轉介薄殼 | 真正邏輯（本體） |
+|-------|---------|---------|---------|
+| `/ingest` | [`.agent/workflows/ingest.md`](.agent/workflows/ingest.md) | [`prompts/ingest.md`](prompts/ingest.md) | [`.claude/skills/ingest/SKILL.md`](.claude/skills/ingest/SKILL.md) |
+| `/query`  | [`.agent/workflows/query.md`](.agent/workflows/query.md)   | [`prompts/query.md`](prompts/query.md)   | [`.claude/skills/query/SKILL.md`](.claude/skills/query/SKILL.md)   |
+| `/lint`   | [`.agent/workflows/lint.md`](.agent/workflows/lint.md)     | [`prompts/lint.md`](prompts/lint.md)     | [`.claude/skills/lint/SKILL.md`](.claude/skills/lint/SKILL.md)     |
 
-**更新 SOP 時改 `prompts/` 那邊就好**，薄殼通常不用動。Claude Code / Codex 用戶可以直接用 `prompts/` 內的觸發語（「請按 prompts/ingest.md 處理 raw/X」），效果一樣。
+**更新 SOP 時改 `.claude/skills/<name>/SKILL.md`（邏輯本體）**，薄殼通常不用動。Claude Code 用戶直接由 `/ingest` 觸發 skill；Antigravity 用戶經由 `.agent/workflows/` → `prompts/` 兩層薄殼指回 skill。

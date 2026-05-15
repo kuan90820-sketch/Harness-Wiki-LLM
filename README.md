@@ -36,38 +36,50 @@ Harness-Wiki-LLM/
 ├── Andrej Karpathy LLM Wiki 架構.md ← 思想源頭（哲學參考）
 │
 ├── raw/                        # Layer 1 — 不可變原始 source（人類擁有，LLM 唯讀）
-│   └── AGENTS.md               #   如何放原料進來、命名規則
+│   └── （規定見 .claude/Docs/raw-conventions.md）
 │
 ├── wiki/                       # Layer 2 — LLM 維護的知識庫（LLM 擁有）
-│   ├── AGENTS.md               #   wiki 寫作公約（frontmatter、連結規範）
 │   ├── index.md                #   內容目錄（每次 ingest 更新）
 │   ├── log.md                  #   時序 append-only 紀錄
 │   ├── entities/               #   實體頁（人 / 組織 / 產品 / 地方）
 │   ├── concepts/               #   概念頁（方法論、原則、術語）
 │   ├── summaries/              #   單篇 source 摘要（與 raw/ 一一對應）
 │   └── syntheses/              #   跨 source 綜合（比較表、論點、open-questions）
+│   #  各頁類型寫作規定見 .claude/Docs/wiki-*.md
 │
-├── prompts/                    # Layer 3 助攻 — 經過驗證的工作流 SOP
-│   ├── ingest.md               #   7 步驟：把新 source 整合進 wiki
-│   ├── query.md                #   5 步驟：針對 wiki 提問並回填 syntheses
-│   └── lint.md                 #   兩階段：W1–W5 機械化 + B1–B6 語意健康檢查
+├── prompts/                    # Layer 3 轉介薄殼 — 給非 Claude Code 工具的入口
+│   ├── ingest.md               #   薄殼，指向 .claude/skills/ingest/SKILL.md
+│   ├── query.md                #   薄殼，指向 .claude/skills/query/SKILL.md
+│   └── lint.md                 #   薄殼，指向 .claude/skills/lint/SKILL.md
 │
 ├── scripts/
 │   └── check-consistency.sh   # 機械化守門（W1–W5）：孤兒頁、缺索引、斷連結、缺 summary
 │
 ├── .claude/                    # Claude Code 整合
 │   ├── settings.json           #   權限白名單
-│   ├── commands/               #   /ingest、/query、/lint slash command
-│   └── skills/karpathy-guidelines/  # 自動載入的精簡編碼守則
+│   ├── commands/               #   /ingest、/query、/lint slash command 薄殼
+│   ├── skills/                 #   邏輯本體（三大操作 SOP）
+│   │   ├── ingest/SKILL.md     #     7 步驟：把新 source 整合進 wiki
+│   │   ├── query/SKILL.md      #     5 步驟：針對 wiki 提問並回填 syntheses
+│   │   ├── lint/SKILL.md       #     兩階段：W1–W5 機械化 + B1–B6 語意健康檢查
+│   │   └── karpathy-guidelines/SKILL.md  # 自動載入的精簡編碼守則
+│   └── Docs/                   #   子目錄寫作規定（原各子目錄 AGENTS.md）
+│       ├── raw-conventions.md          # raw/ 規則（只讀、命名）
+│       ├── prompts-conventions.md      # prompts/ 慣例（轉介薄殼）
+│       ├── wiki-conventions.md         # wiki 共通公約（frontmatter / 連結）
+│       ├── wiki-entities.md            # entity 頁專屬規則 + 模板
+│       ├── wiki-concepts.md            # concept 頁專屬規則 + 模板
+│       ├── wiki-summaries.md           # summary 頁專屬規則 + 模板
+│       └── wiki-syntheses.md           # synthesis 頁專屬規則 + 模板
 │
 ├── .agent/                     # 其他 agent 框架相容層（Antigravity 等）
-│   └── workflows/              #   ingest / query / lint 工作流殼層
+│   └── workflows/              #   ingest / query / lint 入口薄殼
 │
 ├── .githooks/pre-commit        # 本地反饋：commit 前跑 W1–W5
 └── .github/workflows/consistency.yml  # CI 兜底：push / PR 觸發同一腳本
 ```
 
-每個子目錄都有自己的 `AGENTS.md`（全 repo 共 8 份），告訴智能體「這裡放什麼、要遵守什麼規則」——這正是 Harness Engineering「地圖而非手冊」+「漸進式披露」的體現。
+所有子目錄寫作規定統一放在 [`.claude/Docs/`](.claude/Docs/) 下（`raw-conventions.md`、`wiki-conventions.md`、`wiki-entities.md` 等），告訴智能體「這裡放什麼、要遵守什麼規則」——這正是 Harness Engineering「地圖而非手冊」+「漸進式披露」的體現。根目錄保留 `AGENTS.md` 給 Codex / Antigravity 入口用。
 
 ---
 
@@ -87,14 +99,14 @@ git config core.hooksPath .githooks   # 啟用本地 pre-commit 檢查
 
 把第一份原始資料（PDF、markdown、剪報）丟到 `raw/`，然後對你的 LLM agent 說：
 
-> 請按 `prompts/ingest.md` 處理 `raw/<檔名>`。
+> `/ingest raw/<檔名>`（或自然語：「請處理 `raw/<檔名>`」）
 
 LLM 會：閱讀 → 與你討論重點 → 寫一頁 `wiki/summaries/` → 更新或新建相關 `entities/` 與 `concepts/` → 更新 `wiki/index.md` → 在 `wiki/log.md` 補一筆。
 
 ### 3. 提問
 
 ```
-請依 prompts/query.md，回答：「X 與 Y 在 Z 議題上的立場差異？」
+/query 「X 與 Y 在 Z 議題上的立場差異？」
 ```
 
 好的回答應該被回填成 `wiki/syntheses/` 裡的一頁——這樣探索本身也會累積，而非散在聊天紀錄。
@@ -104,7 +116,7 @@ LLM 會：閱讀 → 與你討論重點 → 寫一頁 `wiki/summaries/` → 更�
 每累積 10–20 筆 source 後：
 
 ```
-請依 prompts/lint.md 對 wiki 做一次健康檢查。
+/lint
 ```
 
 ---
@@ -117,7 +129,7 @@ LLM 會：閱讀 → 與你討論重點 → 寫一頁 `wiki/summaries/` → 更�
 | **Query** | 你提問 | 讀 index → 讀相關頁 → 綜合作答 → 詢問是否回填 | 視情況新增 `syntheses/` 一頁 |
 | **Lint** | 你定期觸發 | 找矛盾、孤兒、過期主張、缺頁、可補的網搜題目 | 寫一份 lint 報告，提建議讓你決策 |
 
-詳細工作流見 `prompts/` 目錄。
+詳細工作流見 `.claude/skills/<name>/SKILL.md`（邏輯本體）；`prompts/<name>.md` 是給非 Claude Code 工具的轉介薄殼。
 
 ---
 
@@ -154,7 +166,7 @@ CI 兜底：`.github/workflows/consistency.yml` 在每次 push / PR 觸及 `wiki
 ## 📐 設計取捨
 
 - **不用 embedding RAG**：在中等規模（~100 sources / 數百頁）下，`index.md` + 檔名 + `grep` 已經夠用。需要時再加 [qmd](https://github.com/tobi/qmd) 或自己 vibe-code 一個搜尋腳本。
-- **不寫巨型 instructions**：每個 `AGENTS.md` 都壓在 ~100 行內，靠連結指向更深層。Harness 的「地圖而非手冊」原則。
+- **不寫巨型 instructions**：根 `CLAUDE.md` / `AGENTS.md` 壓在 ~100 行內，子目錄寫作規定拆到 `.claude/Docs/` 下逐檔分述，靠連結指向更深層。Harness 的「地圖而非手冊」原則。
 - **不靠人類維護**：交叉引用、log、index 全部由 LLM 寫；機械化檢查兜底，避免 LLM 漂移。
 - **Wiki 就是一個 git repo**：版本歷史、分支、協作免費送。搭 Obsidian 開來瀏覽（graph view、Marp、Dataview）。
 

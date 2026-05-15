@@ -38,7 +38,7 @@ updated: 2026-05-05
 每頁建議包含：
 
 1. **TL;DR** — 一兩句話
-2. **內容主體** — 視 type 而定（見各子目錄 `AGENTS.md`）
+2. **內容主體** — 視 type 而定（見各子目錄規定檔）
 3. **⚠️ Contradictions**（如有）— 並列引用衝突來源
 4. **🔗 See also** — 與本頁相關的 wiki 頁清單
 
@@ -46,15 +46,15 @@ updated: 2026-05-05
 
 - **每次新增或重大修改一頁，必做三件事**：
   1. 更新該頁 frontmatter 的 `updated`
-  2. 更新 [`index.md`](index.md) 對應條目（沒有就新增）
-  3. append [`log.md`](log.md) 一行：`## [YYYY-MM-DD] update | <頁面相對路徑> — <一句改了什麼>`
+  2. 更新 [`wiki/index.md`](../../wiki/index.md) 對應條目（沒有就新增）
+  3. append [`wiki/log.md`](../../wiki/log.md) 一行：`## [YYYY-MM-DD] update | <頁面相對路徑> — <一句改了什麼>`
 - 引用其他頁用相對路徑：`[XYZ](../entities/xyz.md)`。**不要**用 `[[wikilinks]]`。
 - 不確定的主張：用 `> [!unverified]` callout，並在 `syntheses/open-questions.md` 補一筆。
 - 不要在頁面內塞冗長的歷史紀錄；那是 `log.md` 的事。
 
 ## 下一步
 
-- 要寫 entity → [`entities/AGENTS.md`](entities/AGENTS.md)
-- 要寫 concept → [`concepts/AGENTS.md`](concepts/AGENTS.md)
-- 要寫 source 摘要 → [`summaries/AGENTS.md`](summaries/AGENTS.md)
-- 要寫綜合分析 → [`syntheses/AGENTS.md`](syntheses/AGENTS.md)
+- 要寫 entity → [`wiki-entities.md`](wiki-entities.md)
+- 要寫 concept → [`wiki-concepts.md`](wiki-concepts.md)
+- 要寫 source 摘要 → [`wiki-summaries.md`](wiki-summaries.md)
+- 要寫綜合分析 → [`wiki-syntheses.md`](wiki-syntheses.md)
