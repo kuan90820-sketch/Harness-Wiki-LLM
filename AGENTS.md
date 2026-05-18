@@ -15,5 +15,6 @@ Antigravity 的 slash command 會找 `.agent/workflows/<name>.md`，不會找 `p
 | `/ingest` | [`.agent/workflows/ingest.md`](.agent/workflows/ingest.md) | [`prompts/ingest.md`](prompts/ingest.md) | [`.claude/skills/ingest/SKILL.md`](.claude/skills/ingest/SKILL.md) |
 | `/query`  | [`.agent/workflows/query.md`](.agent/workflows/query.md)   | [`prompts/query.md`](prompts/query.md)   | [`.claude/skills/query/SKILL.md`](.claude/skills/query/SKILL.md)   |
 | `/lint`   | [`.agent/workflows/lint.md`](.agent/workflows/lint.md)     | [`prompts/lint.md`](prompts/lint.md)     | [`.claude/skills/lint/SKILL.md`](.claude/skills/lint/SKILL.md)     |
+| `/graph`  | [`.agent/workflows/graph.md`](.agent/workflows/graph.md)   | [`prompts/graph.md`](prompts/graph.md)   | [`.claude/skills/fireworks-tech-graph/SKILL.md`](.claude/skills/fireworks-tech-graph/SKILL.md) |
 
 **更新 SOP 時改 `.claude/skills/<name>/SKILL.md`（邏輯本體）**，薄殼通常不用動。Claude Code 用戶直接由 `/ingest` 觸發 skill；Antigravity 用戶經由 `.agent/workflows/` → `prompts/` 兩層薄殼指回 skill。
